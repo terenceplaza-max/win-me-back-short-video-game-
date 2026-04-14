@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💘 Win My Heart Back 💘</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Montserrat:wght@400;600;800&family=Satisfy&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            background-size: 400% 400%;
+            animation: lovePulse 8s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            color: #72142c;
+            overflow: hidden;
+        }
+
+        @keyframes lovePulse {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        canvas {
+            border: 6px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            box-shadow: 0 35px 70px rgba(255, 107, 157, 0.4);
+            background: rgba(254, 207, 239, 0.9);
+            backdrop-filter: blur(20px);
+        }
+
+        #header {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 20;
+        }
+
+        #gameTitle {
+            font-family: 'Satisfy', cursive;
+            font-size: 38px;
+            background: linear-gradient(45deg, #ec4899, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
+            margin-bottom: 5px;
+        }
+
+        #heartsCount {
+            font-size: 26px;
+            font-weight: 600;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: 400;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        #victory {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fff5f7 0%, #fecfef 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 80px 20px 40px 20px; /* Added more top padding */
+            z-index: 100;
+            overflow-y: auto; /* Allow scrolling if screen is small */
+        }
+
+        #victory h1 {
+            font-family: 'Satisfy', cursive;
+            font-size: clamp(40px, 8vw, 65px);
+            color: #ec4899;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px rgba(236, 72, 153, 0.4);
+            z-index: 10;
+        }
+
+        #yourPlea {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(22px, 4.5vw, 36px);
+            line-height: 1.6;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.92); /* More opaque */
+            color: #310611; /* Darker for better contrast */
+            padding: 50px;
+            border-radius: 40px;
+            border: 2px solid rgba(236, 72, 153, 0.3);
+            margin: 20px 0;
+            font-weight: 700;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(20px);
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+        }
+
+        #yourPlea.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .plea-line {
+            opacity: 0;
+            display: block;
+            margin-bottom: 10px;
+            transition: opacity 0.8s ease;
+        }
+
+        .plea-line.active {
+            opacity: 1;
+        }
+
+        #playAgain {
+            font-size: 20px;
+            padding: 18px 45px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(45deg, #ec4899, #f472b6);
+            color: white;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(236, 72, 153, 0.4);
+            z-index: 10;
+            opacity: 0;
+        }
+
+        #playAgain.visible {
+            opacity: 1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            color: #f472b6;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatUpDown linear infinite;
+        }
+
+        @keyframes floatUpDown {
+            0% {
+                transform: translateY(110vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.4;
+            }
+
+            90% {
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        #playAgain:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 25px 50px rgba(236, 72, 153, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header">
+        <div id="gameTitle">💖 Win Me Back 💖</div>
+        <div id="heartsCount">❤️ Hearts Won: 0</div>
+    </div>
+
+    <canvas id="gameCanvas" width="700" height="550"></canvas>
+
+    <div id="controls">
+        🎮 WASD / Arrows to run & jump! Use platforms to reach ❤️ Avoid 💔
+    </div>
+
+    <div id="victory">
+        <div id="heartContainer"></div>
+        <h1>🎉 YOU WON ME BACK! 🎉</h1>
+        <div id="yourPlea"></div>
+        <button id="playAgain">💕 Play Again</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const heartsCountEl = document.getElementById('heartsCount');
+        const victoryEl = document.getElementById('victory');
+        const pleaEl = document.getElementById('yourPlea');
+
+        // Game objects
+        const player = { 
+            x: 100, 
+            y: 400, 
+            size: 24, 
+            vx: 0, 
+            vy: 0, 
+            isGrounded: false,
+            jumpCount: 0,
+            invincible: 0 // Duration of invincibility
+        };
+        
+        const world = { gravity: 0.55, scroll: 0 };
+        let heartsWon = 0;
+        let loveHearts = [];
+        let brokenHearts = [];
+        let platforms = [
+            { x: 0, y: 480, w: 2000, h: 100, type: 'ground' }, // Base ground
+            { x: 250, y: 360, w: 250, h: 20 },
+            { x: 450, y: 240, w: 250, h: 20 }
+        ];
+        let backgroundElements = [
+            { x: 100, y: 380, s: 0.5, type: 'hill' },
+            { x: 400, y: 400, s: 0.5, type: 'hill' },
+            { x: 700, y: 390, s: 0.5, type: 'hill' },
+            { x: 200, y: 80, s: 0.3, type: 'cloud' },
+            { x: 500, y: 120, s: 0.3, type: 'cloud' }
+        ];
+        let sparkles = [];
+        let gameRunning = true;
+
+        // Controls
+        const keys = {};
+        document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+        // Spawn love hearts
+        function spawnLoveHeart() {
+            const lastPlatform = platforms[Math.floor(Math.random() * platforms.length)];
+            loveHearts.push({
+                x: canvas.width + 50,
+                y: 100 + Math.random() * 300,
+                size: 16 + Math.random() * 8,
+                vx: -3 - Math.random() * 2,
+                bob: Math.random() * Math.PI * 2
+            });
+        }
+
+        // Spawn obstacles (Broken hearts on ground - Very Rare now)
+        function spawnBrokenHeart() {
+            if (Math.random() < 0.005) {
+                brokenHearts.push({
+                    x: canvas.width + 50,
+                    y: 440,
+                    size: 22,
+                    vx: -3,
+                    rot: 0
+                });
+            }
+        }
+        
+        function spawnPlatform() {
+            const lastP = platforms[platforms.length - 1];
+            if (lastP.x < canvas.width + 100) {
+                platforms.push({
+                    x: canvas.width + 120 + Math.random() * 50,
+                    y: 200 + Math.random() * 200,
+                    w: 200 + Math.random() * 100,
+                    h: 20
+                });
+            }
+        }
+        
+        function updateBackground() {
+            backgroundElements.forEach(el => {
+                el.x -= el.s * 2;
+                if (el.x < -200) el.x = canvas.width + 200;
+            });
+        }
+
+        // Victory sparkles
+        function createSparkles(x, y, color = '#f472b6') {
+            for (let i = 0; i < 15; i++) {
+                sparkles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8 - 2,
+                    life: 45,
+                    maxLife: 45,
+                    size: 3 + Math.random() * 4,
+                    color
+                });
+            }
+        }
+
+        // Game logic
+        function update() {
+            if (!gameRunning) return;
+
+            // X Movement (Horizontal)
+            if (keys['a'] || keys['arrowleft']) player.vx = -6;
+            else if (keys['d'] || keys['arrowright']) player.vx = 6;
+            else player.vx *= 0.85;
+
+            // Y Movement (Gravity)
+            player.vy += world.gravity;
+            player.y += player.vy;
+            player.x += player.vx;
+
+            updateBackground();
+
+            // Platform and Floor collision
+            player.isGrounded = false;
+            if (player.invincible > 0) player.invincible--;
+
+            platforms.forEach(p => {
+                if (player.x + 15 > p.x && player.x - 15 < p.x + p.w &&
+                    player.y + 20 > p.y && player.y + 20 < p.y + p.h + player.vy) {
+                    if (player.vy > 0) {
+                        player.y = p.y - 20;
+                        player.vy = 0;
+                        player.isGrounded = true;
+                        player.jumpCount = 0;
+                    }
+                }
+                // Scroll platforms slower
+                p.x -= 2.5;
+            });
+
+            // Clean up and spawn platforms
+            if (platforms[0].x + platforms[0].w < 0) platforms.shift();
+            if (platforms.length < 6) spawnPlatform();
+
+            // Jumping (Double Jump enabled!)
+            if (keys['w'] || keys['arrowup'] || keys[' ']) {
+                if (player.isGrounded) {
+                    player.vy = -14;
+                    player.isGrounded = false;
+                    player.jumpCount = 1;
+                    keys['w'] = keys['arrowup'] = keys[' '] = false; // Prevent hold/auto-jump
+                } else if (player.jumpCount === 1) {
+                    player.vy = -12;
+                    player.jumpCount = 2;
+                    keys['w'] = keys['arrowup'] = keys[' '] = false;
+                }
+            }
+
+            // Screen bounds
+            player.x = Math.max(30, Math.min(canvas.width - 30, player.x));
+            
+            // Fall protection: Teleport back instead of restarting
+            if (player.y > canvas.height + 100) {
+                player.y = 100;
+                player.vx = 0;
+                player.vy = 0;
+            }
+
+            // Collect items (High frequency for fun!)
+            if (Math.random() < 0.15) spawnLoveHeart();
+            spawnBrokenHeart();
+
+            for (let i = loveHearts.length - 1; i >= 0; i--) {
+                const h = loveHearts[i];
+                h.x += h.vx;
+                h.y += Math.sin(h.bob) * 1;
+                h.bob += 0.1;
+                
+                const dx = h.x - player.x;
+                const dy = h.y - player.y;
+                if (Math.sqrt(dx*dx + dy*dy) < 40) {
+                    heartsWon++;
+                    heartsCountEl.textContent = `❤️ Hearts Won: ${heartsWon}`;
+                    createSparkles(h.x, h.y);
+                    loveHearts.splice(i, 1);
+                    if (heartsWon >= 100) winGame(); 
+                } else if (h.x < -50) loveHearts.splice(i, 1);
+            }
+
+            for (let i = brokenHearts.length - 1; i >= 0; i--) {
+                const bh = brokenHearts[i];
+                bh.x -= 2.5; // Very slow broken hearts
+                const dx = bh.x - player.x;
+                const dy = bh.y - player.y;
+                if (Math.sqrt(dx*dx + dy*dy) < 40 && player.invincible <= 0) {
+                    // No score loss anymore!
+                    heartsCountEl.textContent = `❤️ Hearts Won: ${heartsWon}`;
+                    createSparkles(player.x, player.y, '#ef4444');
+                    brokenHearts.splice(i, 1);
+                    player.invincible = 180; // 3 full seconds of invincibility
+                } else if (bh.x < -50) brokenHearts.splice(i, 1);
+            }
+
+            // Sparkles
+            for (let i = sparkles.length - 1; i >= 0; i--) {
+                const s = sparkles[i];
+                s.x += s.vx; s.y += s.vy; s.life--;
+                if (s.life <= 0) sparkles.splice(i, 1);
+            }
+        }
+
+        // Beautiful rendering
+        function draw() {
+            // Background Sky
+            ctx.fillStyle = '#fecfef';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Background Elements (Hills & Clouds)
+            backgroundElements.forEach(el => {
+                if (el.type === 'hill') {
+                    ctx.fillStyle = '#ff9a9e';
+                    ctx.beginPath();
+                    ctx.arc(el.x, el.y + 100, 150, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.beginPath();
+                    ctx.arc(el.x, el.y, 30, 0, Math.PI * 2);
+                    ctx.arc(el.x + 35, el.y - 10, 40, 0, Math.PI * 2);
+                    ctx.arc(el.x + 70, el.y, 30, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // Draw Platforms
+            platforms.forEach(p => {
+                ctx.fillStyle = p.type === 'ground' ? '#72142c' : '#ec4899';
+                ctx.beginPath();
+                ctx.roundRect(p.x, p.y, p.w, p.h, 10);
+                ctx.fill();
+                
+                if (p.type === 'ground') {
+                    ctx.fillStyle = '#ff9ff3';
+                    for(let i=0; i<p.w; i+=40) {
+                        ctx.fillText('🌸', p.x + i, p.y + 30);
+                    }
+                }
+            });
+
+            // Sparkles
+            sparkles.forEach(s => {
+                ctx.save();
+                ctx.globalAlpha = s.life / 45;
+                ctx.fillStyle = s.color;
+                ctx.fillRect(s.x, s.y, s.size, s.size);
+                ctx.restore();
+            });
+
+            // Love hearts
+            loveHearts.forEach(h => {
+                ctx.save();
+                ctx.translate(h.x, h.y);
+                ctx.scale(h.size/20, h.size/20);
+                ctx.fillStyle = '#ec4899';
+                ctx.shadowColor = '#fff';
+                ctx.shadowBlur = 15;
+                drawHeart();
+                ctx.restore();
+            });
+
+            // Broken hearts
+            brokenHearts.forEach(bh => {
+                ctx.save();
+                ctx.translate(bh.x, bh.y);
+                ctx.fillStyle = '#444';
+                drawCrackedHeart();
+                ctx.restore();
+            });
+
+            // Player (The hero for love - now a girl)
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            
+            // Flash if invincible
+            if (player.invincible > 0 && Math.floor(Date.now() / 100) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
+            }
+            
+            // Hero Character Drawing
+            const bounce = Math.sin(Date.now() * 0.01) * 3;
+            
+            // Hair
+            ctx.fillStyle = '#72142c';
+            ctx.beginPath();
+            ctx.arc(0, -10 + bounce, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Dress
+            ctx.fillStyle = '#ec4899';
+            ctx.beginPath();
+            ctx.moveTo(-12, 12 + bounce);
+            ctx.lineTo(12, 12 + bounce);
+            ctx.lineTo(0, -5 + bounce);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Heart on Dress
+            ctx.save();
+            ctx.translate(0, 5 + bounce);
+            ctx.scale(0.3, 0.3);
+            ctx.fillStyle = '#ffffff';
+            drawPlayerHeart();
+            ctx.restore();
+            
+            // Face
+            ctx.fillStyle = '#fff5f7';
+            ctx.beginPath();
+            ctx.arc(0, -12 + bounce, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes
+            ctx.fillStyle = '#72142c';
+            ctx.fillRect(-4, -14 + bounce, 2, 3);
+            ctx.fillRect(2, -14 + bounce, 2, 3);
+            
+            ctx.restore();
+        }
+
+        function drawPlayerHeart() {
+            ctx.beginPath();
+            ctx.moveTo(0, 6);
+            ctx.bezierCurveTo(0, -12, 18, -12, 18, 0);
+            ctx.bezierCurveTo(18, 12, 0, 20, 0, 20);
+            ctx.bezierCurveTo(0, 20, -18, 12, -18, 0);
+            ctx.bezierCurveTo(-18, -12, 0, -12, 0, 6);
+            ctx.fill();
+        }
+
+        function drawHeart() {
+            ctx.beginPath();
+            ctx.moveTo(0, 6);
+            ctx.bezierCurveTo(0, -12, 18, -12, 18, 0);
+            ctx.bezierCurveTo(18, 12, 0, 20, 0, 20);
+            ctx.bezierCurveTo(0, 20, -18, 12, -18, 0);
+            ctx.bezierCurveTo(-18, -12, 0, -12, 0, 6);
+            ctx.fill();
+        }
+
+        function drawCrackedHeart() {
+            // Main shape
+            ctx.beginPath();
+            ctx.moveTo(0, 6);
+            ctx.bezierCurveTo(0, -12, 18, -12, 18, 0);
+            ctx.bezierCurveTo(18, 12, 0, 20, 0, 20);
+            ctx.bezierCurveTo(0, 20, -18, 12, -18, 0);
+            ctx.bezierCurveTo(-18, -12, 0, -12, 0, 6);
+            ctx.fill();
+
+            // The Crack
+            ctx.save();
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-6, -6);
+            ctx.lineTo(0, 2);
+            ctx.lineTo(6, -4);
+            ctx.lineTo(2, 10);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function winGame() {
+            gameRunning = false;
+            victoryEl.style.display = 'flex';
+
+            // Generate floating hearts
+            const container = document.getElementById('heartContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = (15 + Math.random() * 25) + 'px';
+                heart.style.animationDuration = (4 + Math.random() * 6) + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(heart);
+            }
+
+            const lines = [
+                "Sciatzy,",
+                "I made this game because last night broke my heart 💔",
+                "But playing as me fighting for you? That's exactly what I want to do.",
+                "I MISS YOU and I WANT YOU BACK.",
+                "Every heart you collected = every reason I love you:",
+                "- Your laugh that lights up my world",
+                "- How you make every day better",
+                "- The way you understand me like no one else",
+                "Please give us another chance?",
+                "I promise to fight for us every day. 💪❤️",
+                "Text/call me? I love you so much.",
+                "Your man Terence"
+            ];
+
+            pleaEl.innerHTML = '';
+            pleaEl.classList.add('visible');
+
+            // Typewriter reveal line by line
+            let currentLine = 0;
+            function revealLine() {
+                if (currentLine < lines.length) {
+                    const lineDiv = document.createElement('span');
+                    lineDiv.className = 'plea-line';
+                    lineDiv.textContent = lines[currentLine];
+                    if (lines[currentLine].includes("I MISS YOU") || lines[currentLine].includes("Sciatzy")) {
+                        lineDiv.style.fontWeight = "800";
+                        lineDiv.style.color = "#880e4f"; // Deeper rose color
+                    }
+                    pleaEl.appendChild(lineDiv);
+
+                    setTimeout(() => {
+                        lineDiv.classList.add('active');
+                        currentLine++;
+                        setTimeout(revealLine, 1200);
+                    }, 100);
+                } else {
+                    document.getElementById('playAgain').classList.add('visible');
+                }
+            }
+
+            setTimeout(revealLine, 800);
+        }
+
+        function restartGame() {
+            gameRunning = true;
+            heartsWon = 0;
+            loveHearts = [];
+            brokenHearts = [];
+            sparkles = [];
+            platforms = [
+                { x: 0, y: 480, w: 2000, h: 100, type: 'ground' },
+                { x: 300, y: 350, w: 150, h: 20 },
+                { x: 550, y: 250, w: 150, h: 20 }
+            ];
+            player.x = 100;
+            player.y = 400;
+            player.vx = 0;
+            player.vy = 0;
+            heartsCountEl.textContent = '❤️ Hearts Won: 0';
+            victoryEl.style.display = 'none';
+            pleaEl.classList.remove('visible');
+            document.getElementById('playAgain').classList.remove('visible');
+        }
+
+        document.getElementById('playAgain').onclick = restartGame;
+
+        // Main loop
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+
+        // Responsive canvas
+        function resizeCanvas() {
+            const containerWidth = window.innerWidth;
+            const containerHeight = window.innerHeight;
+            const targetWidth = Math.min(700, containerWidth * 0.95);
+            const targetHeight = Math.min(550, containerHeight * 0.7);
+
+            if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Initialize on load
+    </script>
+</body>
+
+</html>
