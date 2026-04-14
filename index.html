@@ -195,6 +195,20 @@
             }
         }
 
+        #startOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
         #playAgain:hover {
             transform: translateY(-5px) scale(1.05);
             box-shadow: 0 25px 50px rgba(236, 72, 153, 0.6);
@@ -203,6 +217,13 @@
 </head>
 
 <body>
+    <div id="startOverlay">
+        <div style="font-size: 60px; margin-bottom: 20px;">🎮💖</div>
+        <h1 style="font-family: 'Satisfy', cursive; color: #ec4899; font-size: 42px;">Ready to Win Her Back?</h1>
+        <p style="font-family: 'Montserrat', sans-serif; color: #72142c; margin-bottom: 30px;">Turn on your sound for the full experience!</p>
+        <button id="startGameBtn" style="padding: 15px 40px; font-size: 24px; border-radius: 50px; background: #ec4899; color: white; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 800; box-shadow: 0 10px 20px rgba(236,72,153,0.3);">💖 Start Game</button>
+    </div>
+
     <div id="header">
         <div id="gameTitle">💖 Win Me Back 💖</div>
         <div id="heartsCount">❤️ Hearts Won: 0</div>
@@ -227,6 +248,78 @@
         const heartsCountEl = document.getElementById('heartsCount');
         const victoryEl = document.getElementById('victory');
         const pleaEl = document.getElementById('yourPlea');
+
+        // Audio System
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+
+            if (type === 'bgm') {
+                const notes = [261.63, 329.63, 392.00, 440.00]; // C, E, G, A (Romantic chords)
+                let i = 0;
+                function playNextNote() {
+                    if (!gameRunning) return;
+                    const osc = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    osc.connect(g); g.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(notes[i], audioCtx.currentTime);
+                    g.gain.setValueAtTime(0, audioCtx.currentTime);
+                    g.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.5);
+                    g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 2);
+                    osc.start(); osc.stop(audioCtx.currentTime + 2);
+                    i = (i + 1) % notes.length;
+                    setTimeout(playNextNote, 2000);
+                }
+                playNextNote();
+                return;
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'heart') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'jump') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'win') {
+                // Grand Romantic Fanfare
+                [523, 659, 783, 1046, 1318].forEach((freq, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(freq, now + i * 0.2);
+                    g.gain.setValueAtTime(0, now + i * 0.2);
+                    g.gain.linearRampToValueAtTime(0.2, now + i * 0.2 + 0.1);
+                    g.gain.linearRampToValueAtTime(0, now + i * 0.2 + 0.6);
+                    o.start(now + i * 0.2); o.stop(now + i * 0.2 + 0.6);
+                });
+            }
+        }
+
+        document.getElementById('startGameBtn').onclick = () => {
+            initAudio();
+            document.getElementById('startOverlay').style.display = 'none';
+            playSound('bgm');
+        };
 
         // Game objects
         const player = { 
@@ -367,10 +460,12 @@
                     player.vy = -14;
                     player.isGrounded = false;
                     player.jumpCount = 1;
+                    playSound('jump');
                     keys['w'] = keys['arrowup'] = keys[' '] = false; // Prevent hold/auto-jump
                 } else if (player.jumpCount === 1) {
                     player.vy = -12;
                     player.jumpCount = 2;
+                    playSound('jump');
                     keys['w'] = keys['arrowup'] = keys[' '] = false;
                 }
             }
@@ -401,8 +496,9 @@
                     heartsWon++;
                     heartsCountEl.textContent = `❤️ Hearts Won: ${heartsWon}`;
                     createSparkles(h.x, h.y);
+                    playSound('heart');
                     loveHearts.splice(i, 1);
-                    if (heartsWon >= 100) winGame(); 
+                    if (heartsWon >= 150) winGame(); 
                 } else if (h.x < -50) loveHearts.splice(i, 1);
             }
 
@@ -591,7 +687,8 @@
         function winGame() {
             gameRunning = false;
             victoryEl.style.display = 'flex';
-
+            playSound('win');
+            
             // Generate floating hearts
             const container = document.getElementById('heartContainer');
             container.innerHTML = '';
