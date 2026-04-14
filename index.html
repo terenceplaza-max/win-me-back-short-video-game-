@@ -549,17 +549,49 @@
 
             // Draw Platforms
             platforms.forEach(p => {
-                ctx.fillStyle = p.type === 'ground' ? '#72142c' : '#ec4899';
-                ctx.beginPath();
-                ctx.roundRect(p.x, p.y, p.w, p.h, 10);
-                ctx.fill();
-                
+                ctx.save();
                 if (p.type === 'ground') {
+                    // Rolling Hill Ground
+                    ctx.fillStyle = '#72142c';
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y + p.h);
+                    ctx.lineTo(p.x, p.y + 20);
+                    ctx.bezierCurveTo(p.x + p.w/4, p.y - 10, p.x + 3*p.w/4, p.y - 10, p.x + p.w, p.y + 20);
+                    ctx.lineTo(p.x + p.w, p.y + p.h);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Grass/Flower Layer
                     ctx.fillStyle = '#ff9ff3';
-                    for(let i=0; i<p.w; i+=40) {
-                        ctx.fillText('🌸', p.x + i, p.y + 30);
+                    for(let i=10; i<p.w; i+=50) {
+                        ctx.beginPath();
+                        ctx.arc(p.x + i, p.y + 15, 8, 0, Math.PI);
+                        ctx.fill();
+                        ctx.fillText('🌸', p.x + i - 10, p.y + 10);
                     }
+                } else {
+                    // Luxury Cloud Ledges
+                    ctx.shadowColor = 'rgba(236, 72, 153, 0.5)';
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, p.h, 15);
+                    ctx.fill();
+                    
+                    // Ledge Top (Rose Color)
+                    ctx.fillStyle = '#ec4899';
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, 6, {tl: 15, tr: 15, bl: 0, br: 0});
+                    ctx.fill();
+
+                    // Edge Details
+                    ctx.fillStyle = 'rgba(236, 72, 153, 0.1)';
+                    ctx.beginPath();
+                    ctx.arc(p.x + 20, p.y + p.h, 10, 0, Math.PI * 2);
+                    ctx.arc(p.x + p.w - 20, p.y + p.h, 8, 0, Math.PI * 2);
+                    ctx.fill();
                 }
+                ctx.restore();
             });
 
             // Sparkles
